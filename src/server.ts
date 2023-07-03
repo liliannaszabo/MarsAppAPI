@@ -2,8 +2,7 @@ import express from "express";
 import dotenv from 'dotenv';
 import axios from "axios";
 import {getRoverPhotosUsingFilters} from "./APIHandler";
-import {Rover} from "./Rover";
-import {CameraType} from "./CameraType";
+import {PhotoModel} from "./PhotoModel";
 
 dotenv.config();
 
@@ -24,7 +23,7 @@ router.get('/rover/:rover/photos', async (req: any, res:any ) => {
     await getRoverPhotosUsingFilters(req.params.rover, req.query.date, req.query.camera)
         .then(response => {
             if(response !== undefined){
-                res.send(response.data);
+                res.send(response);
             }
             else{
                 res.send("no response from server");

@@ -2,6 +2,7 @@ import moment from "moment";
 import axios from "axios";
 import {CameraType} from "./CameraType";
 import {Rover} from "./Rover";
+import {PhotoModel} from "./PhotoModel";
 
 
 export async function getRoverPhotosUsingFilters(rover: Rover, date: string, camera: CameraType)
@@ -29,10 +30,12 @@ export async function getRoverPhotosUsingFilters(rover: Rover, date: string, cam
     } else {
         return {data: "That is not a correct date"};
     }
+    console.log("Before Req")
     return await axios.get(`https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?${dateType}=${date}&camera=${camera}&api_key=${process.env.API_KEY}`)
         .then(function (response) {
-
-            return response;
+            console.log("After Req")
+            const photoOut: PhotoModel[] = response.data.photos;
+            return photoOut;
         })
         .catch(function (error) {
             return error;
