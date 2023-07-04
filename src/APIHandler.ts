@@ -5,7 +5,7 @@ import {Rover} from "./Rover";
 import {PhotoModel} from "./PhotoModel";
 
 
-export async function getRoverPhotosUsingFilters(rover: Rover, date: string, camera: CameraType, pageStart: number = 1, pageEnd: number = pageStart)
+export async function getRoverPhotosUsingFilters(rover: Rover, date: string = "2016-02-02", camera: CameraType, pageStart: number = 1, pageEnd: number = pageStart)
 {
     let dateType: string;
     let query: string = "";
