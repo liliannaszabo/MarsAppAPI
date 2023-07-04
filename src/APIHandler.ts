@@ -5,24 +5,19 @@ import {Rover} from "./Rover";
 import {PhotoModel} from "./PhotoModel";
 
 
-export async function getRoverPhotosUsingFilters(rover: Rover, date: string, camera: CameraType)
+export async function getRoverPhotosUsingFilters(rover: Rover, date: string, camera: CameraType, pageStart: number = 1, pageEnd: number = pageStart)
 {
     let dateType: string;
+    let query: string = "";
 
     if(date === undefined){
-        date = "1000";
+        return {data:"You are so silly, you forgot to enter a date"}
     }
-    if(camera === undefined){
-        camera = CameraType.fhaz;
-    }
+
+
     if (!Object.values(Rover).includes(rover)) {
         return {data: "You are so silly, that is not a rover"}
     }
-    if(rover === undefined){
-        rover = Rover.curiosity;
-    }
-
-
     if (!(isNaN(Number(date)))) {
         dateType = "sol"
     } else if (moment(date, "YYYY-MM-DD").isValid()) {
@@ -30,17 +25,41 @@ export async function getRoverPhotosUsingFilters(rover: Rover, date: string, cam
     } else {
         return {data: "That is not a correct date"};
     }
-    console.log("Before Req")
-    return await axios.get(`https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?${dateType}=${date}&camera=${camera}&api_key=${process.env.API_KEY}`)
-        .then(function (response) {
-            console.log("After Req")
-            const photoOut: PhotoModel[] = response.data.photos;
-            return photoOut;
-        })
-        .catch(function (error) {
-            return error;
-        })
+    query = query+dateType+"="+date;
 
+    if (!Object.values(CameraType).includes(camera)) {
+        return {data: "You are so silly, that is not a camera"}
+    }
+    else{
+        query += `&camera=${camera}`;
+    }
+
+
+    if ((isNaN(Number(pageStart)))) {
+        pageStart = 1;
+    }
+
+    if ((isNaN(Number(pageEnd)))) {
+        pageEnd = 1;
+    }
+
+
+    if(pageStart > pageEnd){
+        pageEnd = pageStart;
+    }
+
+    let photos: PhotoModel[] = [];
+    for (let i = pageStart; i <= pageEnd; i++) {
+        photos.push(await axios.get(`https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?${query}&page=${i}&api_key=${process.env.API_KEY}`)
+            .then(function (response) {
+                const photoOut: PhotoModel[] = response.data.photos;
+                return photoOut;
+            })
+            .catch(function (error) {
+                return error;
+            }))
+    }
+    return photos;
 }
 
 

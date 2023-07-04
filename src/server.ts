@@ -19,8 +19,12 @@ const router = express.Router();
 // router.get('/test', (req: any, res: { send: (arg0: string) => any; }) => res.send());
 
 
-router.get('/rover/:rover/photos', async (req: any, res:any ) => {
-    await getRoverPhotosUsingFilters(req.params.rover, req.query.date, req.query.camera)
+router.get('/rover/:rover/photos/:camera', async (req: any, res:any ) => {
+
+    let date = req.query.date ? req.query.date: null;
+    let pageStart = req.query.pageStart ? req.query.pageStart: 1;
+    let pageEnd = req.query.pageEnd ? req.query.pageEnd: pageStart;
+    await getRoverPhotosUsingFilters(req.params.rover, date, req.param.camera, pageStart, pageEnd)
         .then(response => {
             if(response !== undefined){
                 res.send(response);
@@ -28,8 +32,6 @@ router.get('/rover/:rover/photos', async (req: any, res:any ) => {
             else{
                 res.send("no response from server");
             }
-
-
         })
 })
 
